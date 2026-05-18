@@ -1,14 +1,15 @@
 import streamlit as st
-import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
 from zoneinfo import ZoneInfo
 import time
 import os
 import json
 import base64
 
-# ==================== CONFIGURAÇÃO DA PÁGINA ====================
+# =========================================================
+# CONFIGURAÇÃO DA PÁGINA
+# =========================================================
 st.set_page_config(
     page_title="Elite Cripto IDX - Premium",
     page_icon="💎",
@@ -16,34 +17,49 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== FUNÇÕES DE IMAGEM ====================
+# =========================================================
+# FUNÇÕES DE IMAGEM
+# =========================================================
 def get_base64_of_bin_file(bin_file):
     try:
-        with open(bin_file, 'rb') as f:
+        with open(bin_file, "rb") as f:
             data = f.read()
+
         return base64.b64encode(data).decode()
+
     except:
         return None
 
+
 def img_to_html(img_path):
+
     bin_str = get_base64_of_bin_file(img_path)
 
     if bin_str:
+
         img_format = img_path.split(".")[-1]
 
-        html_code = f'''
+        return f"""
         <img src="data:image/{img_format};base64,{bin_str}"
-        style="width:100%; max-width:300px; display:block; margin:auto;">
-        '''
-
-        return html_code
+        style="
+            width:100%;
+            max-width:300px;
+            display:block;
+            margin:auto;
+        ">
+        """
 
     return ""
 
-# ==================== BANCO DE DADOS ====================
+
+# =========================================================
+# BANCO DE DADOS
+# =========================================================
 DB_FILE = "users_db.json"
 
+
 def load_users():
+
     default_admin = {
         "admin@elite.com": {
             "password": "admin",
@@ -52,128 +68,183 @@ def load_users():
     }
 
     if os.path.exists(DB_FILE):
+
         try:
+
             with open(DB_FILE, "r") as f:
                 return json.load(f)
+
         except:
             return default_admin
 
     return default_admin
 
+
 def save_users(users):
+
     with open(DB_FILE, "w") as f:
         json.dump(users, f)
 
-# ==================== CSS PREMIUM ====================
-elite_premium_css = """
+
+# =========================================================
+# CSS PREMIUM
+# =========================================================
+elite_css = """
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
 :root{
-    --elite-gold:#D4AF37;
-    --elite-blue-deep:#001122;
+    --gold:#D4AF37;
+    --dark:#000B18;
+    --blue:#001A33;
 }
 
-.main{
-    background: linear-gradient(180deg,#000B18 0%,#001A33 100%);
-    color:#FFFFFF;
-}
-
-h1,h2,h3,p,span,div{
+html, body, [class*="css"]{
     font-family:'Rajdhani',sans-serif;
 }
 
+.main{
+    background:linear-gradient(180deg,var(--dark) 0%,var(--blue) 100%);
+    color:white;
+}
+
+section[data-testid="stSidebar"]{
+    display:none;
+}
+
 .stButton > button{
-    background: linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#FFD700 100%);
-    color:#000B18;
-    border-radius:8px;
-    font-family:'Orbitron',sans-serif;
-    font-weight:900;
-    padding:18px 20px;
     width:100%;
-    text-transform:uppercase;
-    letter-spacing:2px;
+    border:none;
+    border-radius:12px;
+    padding:18px;
     font-size:18px;
-    box-shadow:0 4px 15px rgba(212,175,55,0.4);
+    font-weight:900;
+    letter-spacing:2px;
+    color:#000;
+    background:linear-gradient(135deg,#B8860B 0%,#D4AF37 50%,#FFD700 100%);
+    transition:0.3s;
+    font-family:'Orbitron',sans-serif;
+}
+
+.stButton > button:hover{
+    transform:scale(1.02);
+    box-shadow:0 0 20px rgba(212,175,55,0.5);
 }
 
 .login-box{
     max-width:500px;
-    margin:20px auto;
+    margin:auto;
+    margin-top:40px;
     padding:40px;
-    background:rgba(0,11,24,0.9);
-    border:2px solid var(--elite-gold);
     border-radius:25px;
-    text-align:center;
+    background:rgba(0,0,0,0.6);
+    border:2px solid var(--gold);
 }
 
 .result-box{
-    background:rgba(0,11,24,0.8);
-    border:2px solid var(--elite-gold);
-    border-radius:20px;
-    padding:50px;
-    text-align:center;
+    background:rgba(0,0,0,0.55);
+    border:2px solid var(--gold);
+    border-radius:25px;
+    padding:45px;
     margin-top:30px;
-    backdrop-filter:blur(10px);
+    text-align:center;
+    box-shadow:0 0 25px rgba(212,175,55,0.2);
 }
 
 .signal-text{
+    font-size:70px;
     font-family:'Orbitron',sans-serif;
-    font-size:60px;
     font-weight:900;
-    margin:0;
-    letter-spacing:5px;
-    text-shadow:0 0 20px currentColor;
+    margin-bottom:15px;
 }
 
 .time-text{
+    font-size:36px;
+    color:white;
     font-family:'Orbitron',sans-serif;
-    font-size:35px;
-    color:#FFFFFF;
-    margin-top:15px;
 }
 
 .confidence-text{
-    color:var(--elite-gold);
-    font-size:20px;
+    color:var(--gold);
+    font-size:24px;
     font-weight:bold;
+}
+
+.system-text{
+    text-align:center;
+    color:#00F2FF;
+    font-weight:bold;
+    letter-spacing:2px;
+    margin-top:10px;
+}
+
+.brasilia-clock{
+    text-align:center;
+    color:var(--gold);
+    margin-top:8px;
+    font-size:18px;
 }
 
 </style>
 """
 
-st.markdown(elite_premium_css, unsafe_allow_html=True)
+st.markdown(elite_css, unsafe_allow_html=True)
 
-# ==================== SESSION ====================
-if 'logged_in' not in st.session_state:
+# =========================================================
+# SESSION STATE
+# =========================================================
+if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-if 'user_email' not in st.session_state:
+if "user_email" not in st.session_state:
     st.session_state.user_email = None
 
-if 'current_signal' not in st.session_state:
+if "current_signal" not in st.session_state:
     st.session_state.current_signal = None
+
+if "last_action" not in st.session_state:
+    st.session_state.last_action = None
 
 users = load_users()
 
-# ==================== LOGIN ====================
+# =========================================================
+# LOGIN
+# =========================================================
 if not st.session_state.logged_in:
 
     st.markdown('<div class="login-box">', unsafe_allow_html=True)
 
     if os.path.exists("logo.jpeg"):
-        st.markdown(img_to_html("logo.jpeg"), unsafe_allow_html=True)
+
+        st.markdown(
+            img_to_html("logo.jpeg"),
+            unsafe_allow_html=True
+        )
+
     else:
+
         st.title("💎 ELITE CRIPTO IDX")
 
     st.markdown(
-        "<h3 style='color:#D4AF37; margin-top:20px;'>ACESSO EXCLUSIVO</h3>",
+        """
+        <h2 style="
+            text-align:center;
+            color:#D4AF37;
+            margin-top:20px;
+        ">
+        ACESSO EXCLUSIVO
+        </h2>
+        """,
         unsafe_allow_html=True
     )
 
     email_input = st.text_input("E-mail").strip().lower()
-    pass_input = st.text_input("Senha", type="password").strip()
+
+    pass_input = st.text_input(
+        "Senha",
+        type="password"
+    ).strip()
 
     if st.button("ENTRAR NO TERMINAL"):
 
@@ -185,79 +256,134 @@ if not st.session_state.logged_in:
 
                     st.session_state.logged_in = True
                     st.session_state.user_email = email_input
+
                     st.rerun()
 
                 else:
-                    st.error("❌ Acesso bloqueado.")
+                    st.error("❌ Acesso bloqueado")
 
             else:
-                st.error("❌ Senha incorreta.")
+                st.error("❌ Senha incorreta")
 
         else:
-            st.error("❌ Usuário não cadastrado.")
+            st.error("❌ Usuário não encontrado")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# ==================== APP PRINCIPAL ====================
+# =========================================================
+# APP PRINCIPAL
+# =========================================================
 else:
 
-    col_h1, col_h2, col_h3 = st.columns([1,2,1])
+    # ================= HEADER =================
+    h1, h2, h3 = st.columns([1, 2, 1])
 
-    with col_h2:
+    with h2:
 
         if os.path.exists("logo.jpeg"):
-            st.markdown(img_to_html("logo.jpeg"), unsafe_allow_html=True)
-        else:
+
             st.markdown(
-                "<h1 style='text-align:center; color:#D4AF37;'>ELITE CRIPTO IDX</h1>",
+                img_to_html("logo.jpeg"),
                 unsafe_allow_html=True
             )
 
-    with col_h3:
+        else:
+
+            st.markdown(
+                """
+                <h1 style="
+                    text-align:center;
+                    color:#D4AF37;
+                ">
+                ELITE CRIPTO IDX
+                </h1>
+                """,
+                unsafe_allow_html=True
+            )
+
+    with h3:
 
         if st.button("SAIR"):
+
             st.session_state.logged_in = False
             st.rerun()
 
     st.markdown(
-        "<div style='text-align:center; color:#00F2FF; font-weight:bold; letter-spacing:2px;'>SISTEMA DE ALTA PERFORMANCE ATIVADO</div>",
+        '<div class="system-text">SISTEMA PREMIUM ATIVADO</div>',
         unsafe_allow_html=True
     )
+
+    # ================= RELÓGIO BRASÍLIA =================
+    br_time = datetime.now(
+        ZoneInfo("America/Sao_Paulo")
+    ).strftime("%H:%M:%S")
 
     st.markdown(
-        "<hr style='border-color: rgba(212,175,55,0.3);'>",
+        f"""
+        <div class="brasilia-clock">
+            Horário Brasília: {br_time}
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
-    col_c1, col_c2, col_c3 = st.columns([1,2,1])
+    st.markdown("---")
 
-    with col_c2:
+    # ================= ÁREA CENTRAL =================
+    c1, c2, c3 = st.columns([1, 2, 1])
+
+    with c2:
 
         st.markdown(
-            "<h3 style='text-align:center; color:#D4AF37; letter-spacing:3px;'>ANALISAR PRÓXIMA VELA</h3>",
+            """
+            <h2 style="
+                text-align:center;
+                color:#D4AF37;
+                letter-spacing:2px;
+            ">
+            ANALISAR PRÓXIMA VELA
+            </h2>
+            """,
             unsafe_allow_html=True
         )
 
+        # ================= BOTÃO DE SINAL =================
         if st.button("🔥 IDENTIFICAR OPORTUNIDADE 🔥"):
 
             with st.spinner("ESCANEANDO PADRÕES IDX..."):
 
-                time.sleep(1.5)
+                time.sleep(2)
 
-                action = np.random.choice(["COMPRA", "VENDA"])
+                # ================= EVITAR REPETIÇÃO =================
+                possible_actions = ["COMPRA", "VENDA"]
+
+                if st.session_state.last_action in possible_actions:
+                    possible_actions.remove(
+                        st.session_state.last_action
+                    )
+
+                action = np.random.choice(possible_actions)
+
+                st.session_state.last_action = action
+
+                # ================= ASSERTIVIDADE =================
                 confidence = np.random.randint(97, 100)
 
-                # ==================== HORÁRIO DE BRASÍLIA ====================
-                now = datetime.now(ZoneInfo("America/Sao_Paulo"))
+                # ================= HORÁRIO BRASÍLIA =================
+                now = datetime.now(
+                    ZoneInfo("America/Sao_Paulo")
+                )
 
-                # Próxima vela de 5 minutos
-                next_minute = ((now.minute // 5) + 1) * 5
+                # Próximo múltiplo de 5
+                next_minute = (
+                    ((now.minute // 5) + 1) * 5
+                )
 
-                # Ajuste quando passa de 59 minutos
+                # ================= AJUSTE DA HORA =================
                 if next_minute >= 60:
 
                     next_candle = now.replace(
-                        hour=(now.hour + 1) % 24,
+                        hour=now.hour + 1 if now.hour < 23 else 0,
                         minute=0,
                         second=0,
                         microsecond=0
@@ -273,67 +399,80 @@ else:
 
                 entry_time = next_candle.strftime("%H:%M")
 
-                # ==================== SALVAR SINAL ====================
+                # ================= SALVAR SINAL =================
                 st.session_state.current_signal = {
                     "action": action,
                     "confidence": confidence,
                     "time": entry_time,
-                    "color": "#00FF00" if action == "COMPRA" else "#FF3333"
+                    "color": "#00FF00"
+                    if action == "COMPRA"
+                    else "#FF3333"
                 }
 
-        # ==================== MOSTRAR SINAL ====================
+        # ================= MOSTRAR SINAL =================
         if st.session_state.current_signal:
 
             s = st.session_state.current_signal
 
-            st.markdown(f"""
-            <div class="result-box">
+            st.markdown(
+                f"""
+                <div class="result-box">
 
-                <p class="signal-text" style="color:{s['color']};">
-                    {s['action']}
-                </p>
+                    <p class="signal-text"
+                    style="color:{s['color']};">
+                        {s['action']}
+                    </p>
 
-                <p class="time-text">
-                    entrada às {s['time']}
-                </p>
+                    <p class="time-text">
+                        Entrada às {s['time']}
+                    </p>
 
-                <div style="
-                    background: rgba(212,175,55,0.1);
-                    padding:10px;
-                    border-radius:10px;
-                    border:1px solid #D4AF37;
-                    margin-top:20px;
-                ">
+                    <div style="
+                        background:rgba(212,175,55,0.08);
+                        padding:15px;
+                        border-radius:15px;
+                        margin-top:25px;
+                        border:1px solid #D4AF37;
+                    ">
 
-                    <p class="confidence-text" style="margin:0;">
-                        ASSERTIVIDADE: {s['confidence']}%
+                        <p class="confidence-text">
+                            ASSERTIVIDADE:
+                            {s['confidence']}%
+                        </p>
+
+                    </div>
+
+                    <p style="
+                        margin-top:20px;
+                        color:#AAA;
+                        letter-spacing:2px;
+                    ">
+                        OPERAÇÃO RECOMENDADA PARA M5
                     </p>
 
                 </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-                <p style="
-                    color:#888;
-                    font-size:14px;
-                    margin-top:25px;
-                    letter-spacing:2px;
-                ">
-                    OPERAÇÃO RECOMENDADA PARA M5
-                </p>
-
-            </div>
-            """, unsafe_allow_html=True)
-
-    # ==================== PAINEL ADMIN ====================
+    # =========================================================
+    # PAINEL ADMIN
+    # =========================================================
     if st.session_state.user_email == "admin@elite.com":
 
         st.markdown("<br><br>", unsafe_allow_html=True)
 
-        with st.expander("⚙️ PAINEL DE CONTROLE PREMIUM"):
+        with st.expander("⚙️ PAINEL ADMIN"):
 
-            st.subheader("Cadastrar Novo Cliente")
+            st.subheader("Cadastrar Cliente")
 
-            new_email = st.text_input("E-mail do Cliente").strip().lower()
-            new_pass = st.text_input("Senha do Cliente").strip()
+            new_email = st.text_input(
+                "Novo E-mail"
+            ).strip().lower()
+
+            new_pass = st.text_input(
+                "Nova Senha"
+            ).strip()
 
             if st.button("CRIAR ACESSO"):
 
@@ -346,7 +485,9 @@ else:
 
                     save_users(users)
 
-                    st.success(f"✅ Cliente {new_email} cadastrado!")
+                    st.success(
+                        f"✅ Cliente {new_email} criado"
+                    )
 
                     st.rerun()
 
@@ -356,18 +497,26 @@ else:
 
                 if u_email != "admin@elite.com":
 
-                    col_u1, col_u2 = st.columns([3,1])
+                    col1, col2 = st.columns([3, 1])
 
-                    status = "✅ ATIVO" if data['active'] else "❌ BLOQUEADO"
+                    status = (
+                        "✅ ATIVO"
+                        if data["active"]
+                        else "❌ BLOQUEADO"
+                    )
 
-                    col_u1.write(f"**{u_email}** | {status}")
+                    col1.write(
+                        f"**{u_email}** | {status}"
+                    )
 
-                    if col_u2.button(
+                    if col2.button(
                         "BLOQUEAR/LIBERAR",
                         key=u_email
                     ):
 
-                        users[u_email]["active"] = not users[u_email]["active"]
+                        users[u_email]["active"] = (
+                            not users[u_email]["active"]
+                        )
 
                         save_users(users)
 
