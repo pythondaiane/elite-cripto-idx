@@ -1,0 +1,10 @@
+{
+    "admin@elite.com": {
+        "password": "admin",
+        "active": true
+    },
+    "usuario@teste.com": {
+        "password": "123",
+        "active": true
+    }
+}
